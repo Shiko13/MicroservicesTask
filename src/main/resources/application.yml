@@ -1,0 +1,56 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/microservices
+    username: sa
+    password: rootroot
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  main:
+    allow-circular-references: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  sql:
+    init:
+      mode: always
+  jmx:
+    enabled: true
+
+password:
+  length: 10
+  strength: 12
+
+server:
+  hostname: "localhost"
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+
+security:
+  jwt:
+    signing-key: "0dbe9fb91dcd"
+    access-token:
+      expires-in-s: 172800 #60*60*48
+
+#logging:
+#  level:
+#    root: debug
