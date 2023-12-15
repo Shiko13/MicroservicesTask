@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -47,11 +46,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
             Claims claims = jwtProvider.resolveClaims(request);
-        //TODO Check in database?
-            //TODO Use var
+
             if (claims != null && jwtProvider.validateClaims(Objects.requireNonNull(claims))) {
                 String username = claims.getSubject();
-                Authentication authentication =
+                var authentication =
                         new UsernamePasswordAuthenticationToken(username, "", new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

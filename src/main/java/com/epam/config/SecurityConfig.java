@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,11 +31,16 @@ public class SecurityConfig {
     @Value("${password.strength}")
     private int strength;
 
+    @Value("${password.pepper}")
+    private String pepper;
+
+    @Value("${management.endpoints.web.cors.allowed-origins}")
+    private List<String> allowedOrigins;
+
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
 
-        //TODO
-        AuthenticationManagerBuilder authenticationManagerBuilder =
+        var authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
 
         return authenticationManagerBuilder.build();
@@ -62,21 +68,18 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //TODO Add pepper/salt in application and add in constructor
-        return new BCryptPasswordEncoder(strength);
+        return new BCryptPasswordEncoder(strength, new SecureRandom(pepper.getBytes()));
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        //TODO In properties origin (it can be list)
-        configuration.setAllowedOrigins(List.of("http://localhost:8080"));
+        var configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        //TODO Read about allowed headers
         configuration.setAllowedHeaders(
-                Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "accept", "Origin",
-                        "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+                Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -1,5 +1,6 @@
 package com.epam.util;
 
+import com.epam.repo.JWTRepo;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,10 +24,13 @@ class JwtProviderTest {
 
     private JwtProvider jwtProvider;
 
+    @Mock
+    private JWTRepo jwtRepo;
+
 
     @BeforeEach
     public void setUp() {
-        jwtProvider = new JwtProvider("yourSecretKey", 900L);
+        jwtProvider = new JwtProvider("yourSecretKey", 900L, jwtRepo);
     }
 
     @Test
@@ -51,6 +55,8 @@ class JwtProviderTest {
     @Test
     void invalidateToken_ShouldAddTokenToBlacklist() {
         String tokenToInvalidate = "invalidToken";
+
+        when(jwtRepo.existsByToken(tokenToInvalidate)).thenReturn(true);
 
         jwtProvider.invalidateToken(tokenToInvalidate);
 

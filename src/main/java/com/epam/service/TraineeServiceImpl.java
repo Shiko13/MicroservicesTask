@@ -6,7 +6,6 @@ import com.epam.error.NotFoundException;
 import com.epam.mapper.TraineeMapper;
 import com.epam.mapper.UserMapper;
 import com.epam.model.Trainee;
-import com.epam.model.Trainer;
 import com.epam.model.User;
 import com.epam.model.dto.TraineeDtoInput;
 import com.epam.model.dto.TraineeDtoOutput;
@@ -65,10 +64,10 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeDtoOutput getByUsername(String username) {
         log.info("getByUsername, username = {}", username);
 
-        User user = getUserByUsername(username);
+        var user = getUserByUsername(username);
 
-        Trainee trainee = traineeRepo.findByUserId(user.getId())
-                                     .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
+        var trainee = traineeRepo.findByUserId(user.getId())
+                                 .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
 
         return traineeMapper.toDtoOutput(trainee);
     }
@@ -78,13 +77,13 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeUpdateDtoOutput updateProfile(String username, TraineeProfileDtoInput traineeDtoInput) {
         log.info("updateProfile, traineeDtoInput = {}", traineeDtoInput);
 
-        User user = getUserByUsername(username);
+        var user = getUserByUsername(username);
 
-        Trainee trainee = traineeRepo.findByUserId(user.getId())
-                                     .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
+        var trainee = traineeRepo.findByUserId(user.getId())
+                                 .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
         traineeMapper.updateTraineeProfile(trainee, traineeDtoInput);
 
-        Trainee updatedTrainee = traineeRepo.save(trainee);
+        var updatedTrainee = traineeRepo.save(trainee);
 
         return traineeMapper.toTraineeUpdateDto(updatedTrainee);
     }
@@ -94,13 +93,13 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeUpdateListDtoOutput updateTrainerList(String username, List<TrainerShortDtoInput> trainersUsernames) {
         log.info("updateTrainerList, trainersUsernames = {}", trainersUsernames);
 
-        List<Trainer> selectedTrainers = trainerRepo.findAllByUser_UsernameIn(
+        var selectedTrainers = trainerRepo.findAllByUser_UsernameIn(
                 trainersUsernames.stream().map(TrainerShortDtoInput::getUsername).toList());
-        Trainee trainee = traineeRepo.findByUser_Username(username)
-                                     .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
+        var trainee = traineeRepo.findByUser_Username(username)
+                                 .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
         trainee.setTrainers(selectedTrainers);
 
-        Trainee updatedTrainee = traineeRepo.save(trainee);
+        var updatedTrainee = traineeRepo.save(trainee);
 
         return traineeMapper.toTraineeUpdateListDtoOutput(updatedTrainee);
     }
@@ -110,7 +109,7 @@ public class TraineeServiceImpl implements TraineeService {
     public void deleteByUsername(String username) {
         log.info("deleteByUsername, username = {}", username);
 
-        User user = getUserByUsername(username);
+        var user = getUserByUsername(username);
 
         traineeRepo.deleteById(user.getId());
     }

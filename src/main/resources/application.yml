@@ -17,10 +17,15 @@ spring:
       mode: always
   jmx:
     enabled: true
+  data:
+    mongodb:
+      database: microservices
+      uri: mongodb://localhost:27017
 
 password:
   length: 10
   strength: 12
+  pepper: "5f7j2k"
 
 server:
   hostname: "localhost"
@@ -31,6 +36,8 @@ management:
     web:
       exposure:
         include: "*"
+      cors:
+        allowed-origins: http://localhost:8080
   endpoint:
     health:
       show-details: always
@@ -50,6 +57,11 @@ security:
     signing-key: "0dbe9fb91dcd"
     access-token:
       expires-in-s: 172800 #60*60*48
+
+#mongo:
+#  datasource:
+#    driverClassname: mongodb.jdbc.MongoDriver
+#    url: mongodb://localhost:27017/microservices
 
 #logging:
 #  level:

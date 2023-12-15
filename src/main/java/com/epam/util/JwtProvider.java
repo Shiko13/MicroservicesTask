@@ -1,5 +1,7 @@
 package com.epam.util;
 
+import com.epam.model.JWT;
+import com.epam.repo.JWTRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtParser;
@@ -12,8 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -23,24 +23,20 @@ public class JwtProvider {
     private final String secretKey;
     private final Long expiresInS;
     private final JwtParser jwtParser;
-
-    //TODO Save blackList in database (not relative maybe)?
-    //TODO Stop brut force for registration profile
-    //TODO Read about different methods of authentications
-    private final Set<String> tokenBlacklist = new HashSet<>();
+    private final JWTRepo jwtRepo;
 
     public JwtProvider(@Value("${security.jwt.signing-key}") String secretKey,
-                       @Value("${security.jwt.access-token.expires-in-s:900}") Long expiresInS) {
+                       @Value("${security.jwt.access-token.expires-in-s:900}") Long expiresInS, JWTRepo jwtRepo) {
         this.secretKey = secretKey;
         this.expiresInS = expiresInS;
         this.jwtParser = Jwts.parser().setSigningKey(secretKey);
+        this.jwtRepo = jwtRepo;
     }
 
     public String generateToken(String username) {
-        //TODO LocalDate or Instant with TimeZone
         Claims claims = Jwts.claims().setSubject(username);
-        Date tokenCreateTime = new Date();
-        Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toSeconds(expiresInS));
+        var tokenCreateTime = new Date();
+        var tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toSeconds(expiresInS));
 
         return Jwts.builder()
                    .setClaims(claims)
@@ -87,11 +83,11 @@ public class JwtProvider {
     }
 
     public void invalidateToken(String token) {
-        tokenBlacklist.add(token);
+        jwtRepo.save(new JWT(token));
     }
 
     public boolean isTokenBlacklisted(String token) {
-        return tokenBlacklist.contains(token);
+        return jwtRepo.existsByToken(token);
     }
 
     public boolean validateClaims(Claims claims) throws AuthenticationException {

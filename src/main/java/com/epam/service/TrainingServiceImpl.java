@@ -3,8 +3,6 @@ package com.epam.service;
 import com.epam.error.AccessException;
 import com.epam.error.ErrorMessageConstants;
 import com.epam.mapper.TrainingMapper;
-import com.epam.model.Trainee;
-import com.epam.model.Trainer;
 import com.epam.model.Training;
 import com.epam.model.dto.TrainingDtoInput;
 import com.epam.model.dto.TrainingForTraineeDtoOutput;
@@ -40,11 +38,11 @@ public class TrainingServiceImpl implements TrainingService {
     public Training save(TrainingDtoInput trainingDtoInput) {
         log.info("save, trainingDtoInput = {}", trainingDtoInput);
 
-        Training trainingToSave = trainingMapper.toEntity(trainingDtoInput);
-        Trainee trainee = traineeRepo.findByUser_Username(trainingDtoInput.getTraineeUsername())
+        var trainingToSave = trainingMapper.toEntity(trainingDtoInput);
+        var trainee = traineeRepo.findByUser_Username(trainingDtoInput.getTraineeUsername())
                                      .orElseThrow(
                                              () -> new AccessException(ErrorMessageConstants.ACCESS_ERROR_MESSAGE));
-        Trainer trainer = trainerRepo.findByUser_Username(trainingDtoInput.getTrainerUsername())
+        var trainer = trainerRepo.findByUser_Username(trainingDtoInput.getTrainerUsername())
                                      .orElseThrow(
                                              () -> new AccessException(ErrorMessageConstants.ACCESS_ERROR_MESSAGE));
 
@@ -61,7 +59,7 @@ public class TrainingServiceImpl implements TrainingService {
 
         log.info("findByDateRangeAndTraineeUsername, specification = {}", specification);
 
-        List<Training> trainings = trainingRepo.findAll(specification);
+        var trainings = trainingRepo.findAll(specification);
 
         return trainingMapper.toTrainingForTraineeDtoList(trainings);
     }
@@ -72,7 +70,7 @@ public class TrainingServiceImpl implements TrainingService {
             TrainingTrainerSpecification specification) {
         log.info("findByDateRangeAndTrainerUsername, specification = {}", specification);
 
-        List<Training> trainings = trainingRepo.findAll(specification);
+        var trainings = trainingRepo.findAll(specification);
 
         return trainingMapper.toTrainingForTrainerDtoList(trainings);
     }

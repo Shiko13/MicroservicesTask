@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void changePassword(String username, String oldPassword, String newPassword) {
         log.info("changePassword, username = {}", username);
-        User user = getUserByUsername(username);
+        var user = getUserByUsername(username);
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new AccessException("Old password is incorrect");
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void switchActivate(String username, UserActivateDtoInput userInput) {
         log.info("switchActivate, username = {}", username);
 
-        User user = getUserByUsername(username);
+        var user = getUserByUsername(username);
 
         user.setIsActive(userInput.getIsActive());
         userRepo.save(user);
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new TooManyAttemptsException("Too many attempts. You will be unlocked in 5 minutes.");
         }
 
-        User user = findUserByUsername(username).orElseThrow(
+        var user = findUserByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User not found with username: " + username));
 
         return org.springframework.security.core.userdetails.User.withUsername(username)

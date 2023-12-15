@@ -76,10 +76,10 @@ public class TrainerServiceImpl implements TrainerService {
     public TrainerDtoOutput getByUsername(String username) {
         log.info("getByUserName, username = {}", username);
 
-        User user = getUserByUsername(username);
+        var user = getUserByUsername(username);
 
-        Trainer trainer = trainerRepo.findByUserId(user.getId())
-                                     .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
+        var trainer = trainerRepo.findByUserId(user.getId())
+                                 .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
 
         return trainerMapper.toDtoOutput(trainer);
     }
@@ -89,10 +89,10 @@ public class TrainerServiceImpl implements TrainerService {
     public TrainerUpdateDtoOutput updateProfile(String username, TrainerProfileDtoInput trainerDtoInput) {
         log.info("updateProfile, username = {}", username);
 
-        User user = getUserByUsername(username);
+        var user = getUserByUsername(username);
 
-        Trainer trainer = trainerRepo.findByUserId(user.getId())
-                                     .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
+        var trainer = trainerRepo.findByUserId(user.getId())
+                                 .orElseThrow(() -> new NotFoundException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
 
         if (!trainerDtoInput.getSpecialization().equals(trainer.getTrainingType().getId())) {
             TrainingType trainingType = trainingTypeRepo.findById(trainerDtoInput.getSpecialization())
@@ -111,7 +111,7 @@ public class TrainerServiceImpl implements TrainerService {
     public List<TrainerForTraineeDtoOutput> getTrainersWithEmptyTrainees() {
         log.info("getTrainersWithEmptyTrainees");
 
-        List<Trainer> trainers = trainerRepo.findByTraineesIsEmptyAndUserIsActiveTrue();
+        var trainers = trainerRepo.findByTraineesIsEmptyAndUserIsActiveTrue();
 
         if (freeActiveTrainers != null) {
             freeActiveTrainers.set(trainers.size());
