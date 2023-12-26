@@ -18,4 +18,5 @@ public interface TrainingService {
     List<TrainingForTrainerDtoOutput> findByDateRangeAndTrainerUsername(
                                                                         TrainingTrainerSpecification specification);
 
+    void deleteById(Long id);
 }

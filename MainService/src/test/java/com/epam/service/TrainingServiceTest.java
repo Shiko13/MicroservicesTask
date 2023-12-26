@@ -17,6 +17,7 @@ import com.epam.spec.TrainingTraineeSpecification;
 import com.epam.spec.TrainingTrainerSpecification;
 import com.epam.spec.filter.TrainingTraineeFilter;
 import com.epam.spec.filter.TrainingTrainerFilter;
+import com.netflix.discovery.EurekaClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,6 +54,9 @@ class TrainingServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private EurekaClient eurekaClient;
 
     @Test
     void save_shouldReturnSavedTrainingDtoOutput() {

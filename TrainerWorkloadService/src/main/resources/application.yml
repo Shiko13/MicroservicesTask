@@ -1,0 +1,10 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-cloud-eureka-statistic-client
+
+eureka:
+  instance:
+    hostname: localhost
