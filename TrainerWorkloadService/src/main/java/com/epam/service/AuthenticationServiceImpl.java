@@ -20,15 +20,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String publicStringKey;
 
     @Override
-    public boolean verifyToken(String token) {
+    public void verifyToken(String token) {
         try {
             PublicKey publicKey = convertStringToPublicKey(publicStringKey);
 
             Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
-
-            return true;
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException("Wrong token");
         }
     }
 

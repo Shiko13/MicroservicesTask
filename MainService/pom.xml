@@ -119,7 +119,6 @@
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-impl</artifactId>
       <version>${io.jsonwebtoken.version}</version>
-<!--      <scope>runtime</scope>-->
     </dependency>
 
     <dependency>
@@ -127,12 +126,6 @@
       <artifactId>jjwt-jackson</artifactId>
       <version>${io.jsonwebtoken.version}</version>
       <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>1.68</version>
     </dependency>
   </dependencies>
 

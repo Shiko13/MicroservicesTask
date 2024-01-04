@@ -3,26 +3,18 @@ package com.epam.service;
 import com.epam.model.Trainer;
 import com.epam.model.dto.ActionType;
 import com.epam.model.dto.TrainerDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
-
-    private final AuthenticationService authenticationService;
 
     Map<String, Trainer> sum = new HashMap<>();
 
     @Override
-    public void save(TrainerDto trainerDto, String token) {
-
-        if (!authenticationService.verifyToken(token)) {
-            throw new RuntimeException("Wrong token");
-        }
+    public void save(TrainerDto trainerDto) {
 
         if (trainerDto.getActionType().equals(ActionType.DELETE)) {
             trainerDto.setDuration(-trainerDto.getDuration());

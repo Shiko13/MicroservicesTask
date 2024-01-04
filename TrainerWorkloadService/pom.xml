@@ -55,7 +55,6 @@
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-impl</artifactId>
       <version>${io.jsonwebtoken.version}</version>
-      <!--      <scope>runtime</scope>-->
     </dependency>
 
     <dependency>
