@@ -17,16 +17,13 @@ import com.epam.spec.TrainingTrainerSpecification;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import io.micrometer.core.annotation.Timed;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpHeaders;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -111,33 +108,52 @@ public class TrainingServiceImpl implements TrainingService {
                            .orElseThrow(() -> new AccessException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
     }
 
-    private void sendRequest(Training training, ActionType actionType, HttpServletRequest request) {
-        var trainerDto = TrainerWorkloadDto.builder()
-                                           .username(training.getTrainer().getUser().getUsername())
-                                           .firstName(training.getTrainer().getUser().getFirstName())
-                                           .lastName(training.getTrainer().getUser().getLastName())
-                                           .isActive(training.getTrainer().getUser().getIsActive())
-                                           .date(training.getDate())
-                                           .duration(training.getDuration())
-                                           .actionType(actionType)
-                                           .build();
+    public void sendRequest(Training training, ActionType actionType, HttpServletRequest request) {
+        TrainerWorkloadDto trainerDto = createTrainerDto(training, actionType);
+        String token = tokenExtractorService.extractToken(request);
+        HttpHeaders httpHeaders = createHttpHeaders(token);
+        String url = buildServiceUrl();
 
+        if (url != null) {
+            HttpEntity<TrainerWorkloadDto> requestEntity = createRequestEntity(trainerDto, httpHeaders);
+            sendHttpRequest(url, requestEntity);
+        } else {
+            log.warn("No valid Eureka instance found.");
+        }
+    }
+
+    private TrainerWorkloadDto createTrainerDto(Training training, ActionType actionType) {
+        return TrainerWorkloadDto.builder()
+                                 .username(training.getTrainer().getUser().getUsername())
+                                 .firstName(training.getTrainer().getUser().getFirstName())
+                                 .lastName(training.getTrainer().getUser().getLastName())
+                                 .isActive(training.getTrainer().getUser().getIsActive())
+                                 .date(training.getDate())
+                                 .duration(training.getDuration())
+                                 .actionType(actionType)
+                                 .build();
+    }
+
+    private HttpHeaders createHttpHeaders(String token) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setBearerAuth(token);
+        return httpHeaders;
+    }
+
+    private String buildServiceUrl() {
         InstanceInfo instance = eurekaClient.getNextServerFromEureka("spring-cloud-eureka-statistic-client", false);
+        return (instance != null) ? instance.getHomePageUrl() + "/trainer-another" : null;
+    }
 
-        if (instance != null) {
-            //TODO Add security (authorization server)
-            String url = instance.getHomePageUrl() + "/trainer-another";
-            String token = tokenExtractorService.extractToken(request);
+    private HttpEntity<TrainerWorkloadDto> createRequestEntity(TrainerWorkloadDto trainerDto, HttpHeaders httpHeaders) {
+        return new HttpEntity<>(trainerDto, httpHeaders);
+    }
 
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setBearerAuth(token);
-            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<TrainerWorkloadDto> requestEntity = new HttpEntity<>(trainerDto, httpHeaders);
-            ResponseEntity<TrainerWorkloadDto>
-                    responseEntity = restTemplate.postForEntity(url, requestEntity, TrainerWorkloadDto.class);
-
-//            restTemplate.getInterceptors().add(new J)
-//            restTemplate.postForEntity(url, trainerDto, TrainerWorkloadDto.class);
+    private void sendHttpRequest(String url, HttpEntity<TrainerWorkloadDto> requestEntity) {
+        try {
+            restTemplate.postForEntity(url, requestEntity, TrainerWorkloadDto.class);
+        } catch (Exception e) {
+            log.error("Error while sending HTTP request", e);
         }
     }
 }

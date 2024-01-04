@@ -11,6 +11,7 @@ import com.epam.spec.TrainingTrainerSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -21,12 +22,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,22 +91,33 @@ class TrainingControllerTest {
     @Test
     void save_ShouldOk() {
         TrainingDtoInput trainingDtoInput = createTestTrainingDtoInput();
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
 
-        trainingController.save(trainingDtoInput);
+        trainingController.save(trainingDtoInput, mockRequest);
 
-        verify(trainingService).save(trainingDtoInput);
+        ArgumentCaptor<TrainingDtoInput> trainingDtoInputCaptor = ArgumentCaptor.forClass(TrainingDtoInput.class);
+        ArgumentCaptor<HttpServletRequest> requestCaptor = ArgumentCaptor.forClass(HttpServletRequest.class);
+
+        verify(trainingService).save(trainingDtoInputCaptor.capture(), requestCaptor.capture());
+
+        TrainingDtoInput capturedTrainingDtoInput = trainingDtoInputCaptor.getValue();
+        HttpServletRequest capturedRequest = requestCaptor.getValue();
+
+        assertEquals(trainingDtoInput, capturedTrainingDtoInput);
+        assertEquals(mockRequest, capturedRequest);
     }
 
     @Test
     void save_ShouldThrowAccessException() {
         TrainingDtoInput trainingDtoInput = createTestTrainingDtoInput();
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
 
         Mockito.doThrow(new AccessException("You don't have access for this."))
                .when(trainingService)
-               .save(trainingDtoInput);
+               .save(trainingDtoInput, mockRequest);
 
         AccessException exception =
-                assertThrows(AccessException.class, () -> trainingController.save(trainingDtoInput));
+                assertThrows(AccessException.class, () -> trainingController.save(trainingDtoInput, mockRequest));
 
         assertEquals("You don't have access for this.", exception.getMessage());
     }

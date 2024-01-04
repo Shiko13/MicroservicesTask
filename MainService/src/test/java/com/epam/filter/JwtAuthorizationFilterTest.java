@@ -46,7 +46,7 @@ class JwtAuthorizationFilterTest {
     private FilterChain filterChain;
 
     @Test
-    void doFilterInternal_ValidToken_ShouldSetAuthentication() throws ServletException, IOException {
+    void doFilterInternal_ValidToken_ShouldSetAuthentication() throws Exception {
         when(jwtProvider.resolveToken(request)).thenReturn("validAccessToken");
 
         Claims mockClaims = mock(Claims.class);
@@ -82,7 +82,7 @@ class JwtAuthorizationFilterTest {
     }
 
     @Test
-    void doFilterInternal_ValidClaims_ShouldSetAuthentication() throws ServletException, IOException {
+    void doFilterInternal_ValidClaims_ShouldSetAuthentication() throws Exception {
         String validToken = "validToken";
         when(jwtProvider.resolveToken(request)).thenReturn(validToken);
 

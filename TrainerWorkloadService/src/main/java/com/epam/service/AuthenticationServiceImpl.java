@@ -1,6 +1,5 @@
 package com.epam.service;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +17,17 @@ import java.util.Base64;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Value("${security.jwt.public-key}")
-    private String publicKey;
+    private String publicStringKey;
 
+    @Override
     public boolean verifyToken(String token) {
         try {
-            PublicKey publicKey1 = convertStringToPublicKey(publicKey);
+            PublicKey publicKey = convertStringToPublicKey(publicStringKey);
 
-            Jwts.parser().setSigningKey(publicKey1).parseClaimsJws(token).getBody();
+            Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
 
             return true;
         } catch (Exception e) {
-            // Handle verification failure
             return false;
         }
     }

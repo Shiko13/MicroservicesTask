@@ -25,16 +25,16 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwtProvider {
 
-    private final String privateKey;
-    private final String publicKey;
+    private final String privateStringKey;
+    private final String String;
     private final Long expiresInS;
     private final JWTRepo jwtRepo;
 
-    public JwtProvider(@Value("${security.jwt.signing-key}") String privateKey,
-                       @Value("${security.jwt.public-key}") String publicKey,
+    public JwtProvider(@Value("${security.jwt.signing-key}") String privateStringKey,
+                       @Value("${security.jwt.public-key}") String publicStringKey,
                        @Value("${security.jwt.access-token.expires-in-s:900}") Long expiresInS, JWTRepo jwtRepo) {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
+        this.privateStringKey = privateStringKey;
+        this.String = publicStringKey;
         this.expiresInS = expiresInS;
         this.jwtRepo = jwtRepo;
     }
@@ -45,21 +45,19 @@ public class JwtProvider {
         var tokenCreateTime = new Date();
         var tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toSeconds(expiresInS));
 
-        PrivateKey privateKey1 = convertStringToPrivateKey(privateKey);
+        PrivateKey privateKey = convertStringToPrivateKey(privateStringKey);
 
         return Jwts.builder()
                    .setClaims(claims)
                    .setExpiration(tokenValidity)
-                   .signWith(privateKey1, SignatureAlgorithm.RS512)
+                   .signWith(privateKey, SignatureAlgorithm.RS512)
                    .compact();
     }
 
     private Claims parseJwtClaims(String token) throws Exception {
-        PublicKey publicKey1 = convertStringToPublicKey(publicKey);
+        var publicKey = convertStringToPublicKey(String);
 
-//        return Jwts.parser().setSigningKey(publicKey1).parseClaimsJws(token).getBody();
-
-        return Jwts.parserBuilder().setSigningKey(publicKey1).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
     }
 
     public Claims resolveClaims(HttpServletRequest req) throws Exception {
