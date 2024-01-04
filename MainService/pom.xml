@@ -20,7 +20,7 @@
     <java.version>17</java.version>
     <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     <sonar.coverage.exclusions>**/com/epam/spec/**, **/com/epam/actuator/**</sonar.coverage.exclusions>
-    <jjwt.version>0.9.1</jjwt.version>
+    <io.jsonwebtoken.version>0.11.5</io.jsonwebtoken.version>
   </properties>
 
   <dependencies>
@@ -111,8 +111,28 @@
 
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt</artifactId>
-      <version>${jjwt.version}</version>
+      <artifactId>jjwt-api</artifactId>
+      <version>${io.jsonwebtoken.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>${io.jsonwebtoken.version}</version>
+<!--      <scope>runtime</scope>-->
+    </dependency>
+
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>${io.jsonwebtoken.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.68</version>
     </dependency>
   </dependencies>
 

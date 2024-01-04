@@ -3,18 +3,27 @@ package com.epam.service;
 import com.epam.model.Trainer;
 import com.epam.model.dto.ActionType;
 import com.epam.model.dto.TrainerDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
+
+    private final AuthenticationService authenticationService;
 
     Map<String, Trainer> sum = new HashMap<>();
 
     @Override
-    public void save(TrainerDto trainerDto) {
+    public void save(TrainerDto trainerDto, String token) {
+
+        if (!authenticationService.verifyToken(token)) {
+            throw new RuntimeException("Wrong token");
+        }
+
         if (trainerDto.getActionType().equals(ActionType.DELETE)) {
             trainerDto.setDuration(-trainerDto.getDuration());
         }
@@ -52,17 +61,8 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     private static void updateDuration(TrainerDto trainerDto, Trainer trainer, Integer year, Integer month) {
-
-        if (trainer.getDuration().get(year) != null && trainer.getDuration().get(year).get(month) != null) {
-            Long currentDuration = trainer.getDuration().get(year).get(month);
-            Long newDuration = currentDuration + trainerDto.getDuration();
-            trainer.getDuration().get(year).put(month, newDuration);
-        } else if (trainer.getDuration().get(year) != null) {
-            trainer.getDuration().get(year).put(month, trainerDto.getDuration());
-        } else {
-            Map<Integer, Long> months = new HashMap<>();
-            months.put(month, trainerDto.getDuration());
-            trainer.getDuration().put(year, months);
-        }
+        trainer.getDuration()
+               .computeIfAbsent(year, k -> new HashMap<>())
+               .merge(month, trainerDto.getDuration(), Long::sum);
     }
 }

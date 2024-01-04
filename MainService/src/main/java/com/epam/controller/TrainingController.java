@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Validated
@@ -48,14 +49,14 @@ public class TrainingController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Save Training", notes = "Create a new training based on the provided input.")
-    public void save(@RequestBody TrainingDtoInput trainingDtoInput) {
-        trainingService.save(trainingDtoInput);
+    public void save(@RequestBody TrainingDtoInput trainingDtoInput, HttpServletRequest request) {
+        trainingService.save(trainingDtoInput, request);
     }
 
     @DeleteMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete Training", notes = "Delete a training by id.")
-    public void deleteById(@RequestParam Long id) {
-        trainingService.deleteById(id);
+    public void deleteById(@RequestParam Long id, HttpServletRequest request) {
+        trainingService.deleteById(id, request);
     }
 }

@@ -24,7 +24,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/login")
     @ApiOperation(value = "Login page", notes = "After login will be send Bearer token")
-    public AuthResponse login(@RequestParam String username, @RequestParam String password) {
+    public AuthResponse login(@RequestParam String username, @RequestParam String password) throws Exception {
         return authenticationService.login(username, password);
     }
 

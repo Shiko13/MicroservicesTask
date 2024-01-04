@@ -17,12 +17,18 @@ import com.epam.spec.TrainingTrainerSpecification;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import io.micrometer.core.annotation.Timed;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Slf4j
@@ -42,9 +48,11 @@ public class TrainingServiceImpl implements TrainingService {
 
     private final EurekaClient eurekaClient;
 
+    private final TokenExtractorService tokenExtractorService;
+
     @Override
     @Transactional
-    public Training save(TrainingDtoInput trainingDtoInput) {
+    public Training save(TrainingDtoInput trainingDtoInput, HttpServletRequest request) {
         log.info("save, trainingDtoInput = {}", trainingDtoInput);
 
         var trainingToSave = trainingMapper.toEntity(trainingDtoInput);
@@ -58,7 +66,7 @@ public class TrainingServiceImpl implements TrainingService {
 
         var savedTraining = trainingRepo.save(trainingToSave);
 
-        sendRequest(savedTraining, ActionType.POST);
+        sendRequest(savedTraining, ActionType.POST, request);
 
         return savedTraining;
     }
@@ -88,14 +96,14 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(Long id, HttpServletRequest request) {
         log.info("deleteById, id = {}", id);
 
         var training = getTrainingById(id);
 
         trainingRepo.delete(training);
 
-        sendRequest(training, ActionType.DELETE);
+        sendRequest(training, ActionType.DELETE, request);
     }
 
     private Training getTrainingById(Long id) {
@@ -103,7 +111,7 @@ public class TrainingServiceImpl implements TrainingService {
                            .orElseThrow(() -> new AccessException(ErrorMessageConstants.NOT_FOUND_MESSAGE));
     }
 
-    private void sendRequest(Training training, ActionType actionType) {
+    private void sendRequest(Training training, ActionType actionType, HttpServletRequest request) {
         var trainerDto = TrainerWorkloadDto.builder()
                                            .username(training.getTrainer().getUser().getUsername())
                                            .firstName(training.getTrainer().getUser().getFirstName())
@@ -117,8 +125,19 @@ public class TrainingServiceImpl implements TrainingService {
         InstanceInfo instance = eurekaClient.getNextServerFromEureka("spring-cloud-eureka-statistic-client", false);
 
         if (instance != null) {
+            //TODO Add security (authorization server)
             String url = instance.getHomePageUrl() + "/trainer-another";
-            restTemplate.postForEntity(url, trainerDto, TrainerWorkloadDto.class);
+            String token = tokenExtractorService.extractToken(request);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setBearerAuth(token);
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<TrainerWorkloadDto> requestEntity = new HttpEntity<>(trainerDto, httpHeaders);
+            ResponseEntity<TrainerWorkloadDto>
+                    responseEntity = restTemplate.postForEntity(url, requestEntity, TrainerWorkloadDto.class);
+
+//            restTemplate.getInterceptors().add(new J)
+//            restTemplate.postForEntity(url, trainerDto, TrainerWorkloadDto.class);
         }
     }
 }

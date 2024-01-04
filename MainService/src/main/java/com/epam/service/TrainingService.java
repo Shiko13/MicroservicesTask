@@ -7,16 +7,17 @@ import com.epam.model.dto.TrainingForTrainerDtoOutput;
 import com.epam.spec.TrainingTraineeSpecification;
 import com.epam.spec.TrainingTrainerSpecification;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface TrainingService {
 
-    Training save(TrainingDtoInput trainingDtoInput);
+    Training save(TrainingDtoInput trainingDtoInput, HttpServletRequest request);
 
     List<TrainingForTraineeDtoOutput> findByDateRangeAndTraineeUsername(TrainingTraineeSpecification specification);
 
     List<TrainingForTrainerDtoOutput> findByDateRangeAndTrainerUsername(
                                                                         TrainingTrainerSpecification specification);
 
-    void deleteById(Long id);
+    void deleteById(Long id, HttpServletRequest request);
 }

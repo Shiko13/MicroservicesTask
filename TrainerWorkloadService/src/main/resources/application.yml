@@ -6,5 +6,13 @@ spring:
     name: spring-cloud-eureka-statistic-client
 
 eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
   instance:
     hostname: localhost
+
+security:
+  jwt:
+    public-key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkVvRct+JLtWE7KomD7wYEMMHvUm8jFcH38JtJR9x2+SgSdSe1iHkFPD0sT0YaW46obJ+7eu+GiRZyB/pi9XaKlmh2IwGg+mZqd9FYh5Nb88VHnNqg5SZ8pOsHx6bZqRfOFWrgXL0OD++ss/RWEdThx/PrfYlAz9a8QPJ22QT8TPb0Pc39SP2bNhYnDGz05O76tm5/JCApDp0zSvGapi86rMRrq17O6lcXWGUHHqJoqC98k3xPb9nZtcS6ur5pmxYiPd704U41H5wM5jPoYEC+1b3ISofY9OFTznDQLw5Mg9II0v4MQUg32nMHLWMURfMWdKdVagYZVSw0dAFww0C0QIDAQAB"
