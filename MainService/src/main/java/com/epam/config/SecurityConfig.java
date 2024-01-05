@@ -40,8 +40,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
 
-        var authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
+        var authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
         return authenticationManagerBuilder.build();
     }
@@ -78,8 +77,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        configuration.setAllowedHeaders(
-                Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

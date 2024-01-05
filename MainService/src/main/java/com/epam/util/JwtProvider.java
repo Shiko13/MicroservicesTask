@@ -4,7 +4,6 @@ import com.epam.model.JWT;
 import com.epam.repo.JWTRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +12,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -20,36 +25,42 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwtProvider {
 
-    private final String secretKey;
+    private final String privateStringKey;
+    private final String publicStringKey;
     private final Long expiresInS;
-    private final JwtParser jwtParser;
     private final JWTRepo jwtRepo;
 
-    public JwtProvider(@Value("${security.jwt.signing-key}") String secretKey,
+    public JwtProvider(@Value("${security.jwt.signing-key}") String privateStringKey,
+                       @Value("${security.jwt.public-key}") String publicStringKey,
                        @Value("${security.jwt.access-token.expires-in-s:900}") Long expiresInS, JWTRepo jwtRepo) {
-        this.secretKey = secretKey;
+        this.privateStringKey = privateStringKey;
+        this.publicStringKey = publicStringKey;
         this.expiresInS = expiresInS;
-        this.jwtParser = Jwts.parser().setSigningKey(secretKey);
         this.jwtRepo = jwtRepo;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username) throws Exception {
         Claims claims = Jwts.claims().setSubject(username);
+
         var tokenCreateTime = new Date();
         var tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toSeconds(expiresInS));
+
+        PrivateKey privateKey = convertStringToPrivateKey(privateStringKey);
 
         return Jwts.builder()
                    .setClaims(claims)
                    .setExpiration(tokenValidity)
-                   .signWith(SignatureAlgorithm.HS256, secretKey)
+                   .signWith(privateKey, SignatureAlgorithm.RS512)
                    .compact();
     }
 
-    private Claims parseJwtClaims(String token) {
-        return jwtParser.parseClaimsJws(token).getBody();
+    private Claims parseJwtClaims(String token) throws Exception {
+        var publicKey = convertStringToPublicKey(publicStringKey);
+
+        return Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
     }
 
-    public Claims resolveClaims(HttpServletRequest req) {
+    public Claims resolveClaims(HttpServletRequest req) throws Exception {
         try {
             String token = resolveToken(req);
             if (token != null) {
@@ -92,6 +103,26 @@ public class JwtProvider {
 
     public boolean validateClaims(Claims claims) throws AuthenticationException {
         return claims.getExpiration().after(new Date());
+    }
+
+    public static PrivateKey convertStringToPrivateKey(String base64EncodedPrivateKey) throws Exception {
+        byte[] privateKeyBytes = Base64.getDecoder().decode(base64EncodedPrivateKey);
+
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    public static PublicKey convertStringToPublicKey(String base64EncodedPublicKey) throws Exception {
+        byte[] publicKeyBytes = Base64.getDecoder().decode(base64EncodedPublicKey);
+
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+        return keyFactory.generatePublic(keySpec);
     }
 }
 

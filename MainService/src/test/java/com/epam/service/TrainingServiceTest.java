@@ -17,12 +17,14 @@ import com.epam.spec.TrainingTraineeSpecification;
 import com.epam.spec.TrainingTrainerSpecification;
 import com.epam.spec.filter.TrainingTraineeFilter;
 import com.epam.spec.filter.TrainingTrainerFilter;
+import com.netflix.discovery.EurekaClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,9 +57,15 @@ class TrainingServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private TokenExtractorService tokenExtractorService;
+
+    @Mock
+    private EurekaClient eurekaClient;
+
     @Test
     void save_shouldReturnSavedTrainingDtoOutput() {
-        User user = createUser();
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         Trainee trainee = createTrainee();
         Trainer trainer = createTrainer();
 
@@ -70,14 +79,14 @@ class TrainingServiceTest {
         when(trainerRepo.findByUser_Username(trainingDtoInput.getTrainerUsername())).thenReturn(
                 Optional.ofNullable(trainer));
 
-        Training result = trainingService.save(trainingDtoInput);
+        Training result = trainingService.save(trainingDtoInput, mockRequest);
 
         assertEquals(savedTraining.getId(), result.getId());
     }
 
     @Test
     void save_invalidTrainee_shouldThrowAccessError() {
-        User user = createUser();
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         Trainee trainee = createTrainee();
 
         TrainingDtoInput trainingDtoInput = createTrainingDtoInput();
@@ -87,22 +96,25 @@ class TrainingServiceTest {
         when(traineeRepo.findByUser_Username(trainingDtoInput.getTraineeUsername())).thenReturn(
                 Optional.ofNullable(trainee));
 
-        AccessException exception = assertThrows(AccessException.class, () -> trainingService.save(trainingDtoInput),
-                "An AccessException should be thrown when the trainer does not exist");
+        AccessException exception =
+                assertThrows(AccessException.class, () -> trainingService.save(trainingDtoInput, mockRequest),
+                        "An AccessException should be thrown when the trainer does not exist");
 
         assertEquals("You don't have access for this.", exception.getMessage());
     }
 
     @Test
     void save_invalidTrainer_shouldThrowAccessError() {
-        User user = createUser();
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+
         TrainingDtoInput trainingDtoInput = createTrainingDtoInput();
         Training savedTraining = createTraining(trainingDtoInput);
 
         when(trainingMapper.toEntity(any())).thenReturn(savedTraining);
 
-        AccessException exception = assertThrows(AccessException.class, () -> trainingService.save(trainingDtoInput),
-                "An AccessException should be thrown when the trainer does not exist");
+        AccessException exception =
+                assertThrows(AccessException.class, () -> trainingService.save(trainingDtoInput, mockRequest),
+                        "An AccessException should be thrown when the trainer does not exist");
 
         assertEquals("You don't have access for this.", exception.getMessage());
     }

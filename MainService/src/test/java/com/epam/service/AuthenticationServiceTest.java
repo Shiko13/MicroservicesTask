@@ -32,7 +32,7 @@ class AuthenticationServiceTest {
     private AuthenticationServiceImpl authenticationService;
 
     @Test
-    void login_ShouldReturnAuthToken() {
+    void login_ShouldReturnAuthToken() throws Exception {
         String username = "testUser";
         String password = "testPassword";
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))

@@ -24,7 +24,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     @Counted("login_attempts")
-    public AuthResponse login(String username, String password) {
+    public AuthResponse login(String username, String password) throws Exception {
         var authenticate =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
