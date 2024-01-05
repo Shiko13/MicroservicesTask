@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-cloud-eureka-statistic-client
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 5
+    instance-info-replication-interval-seconds: 5
+  instance:
+    hostname: localhost
+
+security:
+  jwt:
+    public-key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA19fnIiDnTgcrNcOENSXCpWfrXhgzrW2/dcmFKbeqCQp3Gxh/BphPuWkyb6XA1WcGWJ3x3zlBPU056HqDpHPsQ2UIg65hMHYAAEd43s1mR3/SlNkXTpZ6yQbH0ibq6MA+OQMJQVbwSMKM8reb04gu4YLj+xlPE8bcSz3qHjeeDNI/eHeKBuFZbXcfrLsdIFi6loBjpnzf2Z5FXUZ3z6VWBzxdbn+mIFTaaotJrmYj5d1PrxRXZYop6SEcKQ7yjcxdDSexrLLOlXqQ9W47AG/Nz13pRXhbgTZ++a7JSQEqt23ovusow8PqMlfw0Kc6c8LpAbsvZfCkHVpikuaTrKGFcwIDAQAB"

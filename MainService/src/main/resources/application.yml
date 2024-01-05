@@ -1,0 +1,84 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/microservices
+    username: sa
+    password: rootroot
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  main:
+    allow-circular-references: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  sql:
+    init:
+      mode: always
+  jmx:
+    enabled: true
+  data:
+    mongodb:
+      database: microservices
+      uri: mongodb://localhost:27017
+  application:
+    name: spring-cloud-eureka-client
+
+password:
+  length: 10
+  strength: 12
+  pepper: "5f7j2k"
+
+server:
+  hostname: "localhost"
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      cors:
+        allowed-origins: http://localhost:8080, http://localhost:8081
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+
+security:
+  jwt:
+    signing-key: "MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQDX1+ciIOdOBys1w4Q1JcKlZ+teGDOtbb91yYUpt6oJCncbGH8GmE+5aTJvpcDVZwZYnfHfOUE9TTnoeoOkc+xDZQiDrmEwdgAAR3jezWZHf9KU2RdOlnrJBsfSJurowD45AwlBVvBIwozyt5vTiC7hguP7GU8TxtxLPeoeN54M0j94d4oG4Vltdx+sux0gWLqWgGOmfN/ZnkVdRnfPpVYHPF1uf6YgVNpqi0muZiPl3U+vFFdliinpIRwpDvKNzF0NJ7Gsss6VepD1bjsAb83PXelFeFuBNn75rslJASq3bei+6yjDw+oyV/DQpzpzwukBuy9l8KQdWmKS5pOsoYVzAgMBAAECggEBALLPzU5rvdPZgoWOzPcOqjtHZSjVmfJCKkwVP7k4y6ejwNp0p7857UooCT2PLrpcGFjPuHH6R77WPHQJEwfpdUC78ZrNmvx/tS6GB29k8CepkDX5xyI27c+eS2ohDZj2slWe20sDEBrm+ceWLoTGnDf8rIv4ApfateOrjkmsP8ZT3em6rQl7olpV3gk0E7bCe1xKEqxb8to1p6ODWrBsFc/b6ck8nnC/tCjpmR0ysJM5marVfZu5u7LU3/Wtdr+Y2WvBLycyv6Epzwtxl7LjZ2rXvDJ9R2mAbk//6DONHZlD3IuidUmfi5m+pwmVpL6B5hG9piqiROkWDL27OvRRUrECgYEA8CljljbJ+lPCEZTlqLGRagOEg7/humsEl2sZyfKZCqbkEsz/ToT2g+/LXJpMlkI/F+eKnub2iZfQ5Q2soEGmiR8749dzO6RPlz2RJLQPMutPPq3BAXnqSlrOrf7pJw2u+k5FGUgnAOSoaGjel/Dr5lB1ywcW6Iu0JQefW6CzqRkCgYEA5hPzqgKuh99dlk8V4hM1lTRPmNw3MrMh+fyNeI9G/NOqLmtcKN0juWCC0UnQ2Lziv5yT0ru3a/U21aWUHvaX2E/G0GalNvf4Q1IUSWnAlw0yQZXFdbsody1/mb0Dy4XKY9+WPJ2veU7E2xWlrzyRHqew8fq+5WtDcwKfqGubmGsCgYEAxhT9JJpQAP4wZRvwSDEdBNmd5KTQ41b9VH5rqNtFSznXh4I5WWPlh3CyxNAnNw+wxmCdPu60jUwAacvbg9piJ1rxpLzBOIIPe2i2XBV/K7pVhBb/x93sViOLsIs9do6csar45x9RvDTcijFk1uFJUI8weKKCTI9dp+UflQ144ZECgYEAg0uJdlBXdtQhnP/+leeuYTnb3nh0y2rsDbNwrAbfVLIZYKoFipA/ra8EmBhOpRCNORlKRiy3TFU/+IWn1E+WcWt9IjohOBAjzY8OYqKFs+1k64Zji37FZdVCBuKVQtRTndDe9DJsC4bG0ds1lJ20ltDNKhmUTGl8sSojIEJgJYcCgYEAy8CLD2C1xI+TvAIsejcmqoZOYKFQmGTm/2FjSWW7jcciIIcD4YBKtcysM9i2our+N+weqcF+65trsFksu2tlyxZyqE7bU+ar7AHwUAzh+1ANZ1eZ9VOHwIfSBYKiRrhOsuigy3Zvw9ZSNazUlsyv5iQyDB1eFsD3XB/kx7hF5Ss="
+    public-key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA19fnIiDnTgcrNcOENSXCpWfrXhgzrW2/dcmFKbeqCQp3Gxh/BphPuWkyb6XA1WcGWJ3x3zlBPU056HqDpHPsQ2UIg65hMHYAAEd43s1mR3/SlNkXTpZ6yQbH0ibq6MA+OQMJQVbwSMKM8reb04gu4YLj+xlPE8bcSz3qHjeeDNI/eHeKBuFZbXcfrLsdIFi6loBjpnzf2Z5FXUZ3z6VWBzxdbn+mIFTaaotJrmYj5d1PrxRXZYop6SEcKQ7yjcxdDSexrLLOlXqQ9W47AG/Nz13pRXhbgTZ++a7JSQEqt23ovusow8PqMlfw0Kc6c8LpAbsvZfCkHVpikuaTrKGFcwIDAQAB"
+    access-token:
+      expires-in-s: 172800 #60*60*48
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 5
+    instance-info-replication-interval-seconds: 5
+#  instance:
+#    ip-address: localhost
+#    hostname: localhost
+
+hystrix:
+  command:
+    getAll:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000
+
+#logging:
+#  level:
+#    root: debug
